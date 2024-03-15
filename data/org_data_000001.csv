@@ -1,10 +1,10 @@
-﻿id,name,title,parentId,email
-jd01,John Doe,Manager,ew05,jd01@acme.com
-js02,Jane Smith,Analyst,jd01,js02@acme.com
-aj03,Alice Johnson,Director,sw07,aj03@acme.com
-bb04,Bob Brown,Analyst,aj03,bb04@acme.com
-ew05,Emily White,Vice President,cm09,ew05@acme.com
-dl06,David Lee,Analyst,ew05,dl06@acme.com
-sw07,Sarah Wilson,Director,cm09,sw07@acme.com
-md08,Michael Davis,Analyst,sw07,md08@acme.com
-cm09,Chris Miller,Vice President,,cm09@acme.com
+id,name,title,parentId,scope
+jd01,John Doe,Manager,ew05,Sales
+js02,Jane Smith,Analyst,jd01,Sales
+aj03,Alice Johnson,Director,sw07,Marketing
+bb04,Bob Brown,Analyst,aj03,Marketing
+ew05,Emily White,Vice President,cm09,Operations
+dl06,David Lee,Analyst,ew05,Operations
+sw07,Sarah Wilson,Director,cm09,HR
+md08,Michael Davis,Analyst,sw07,HR
+cm09,Chris Miller,Vice President,,Consumer Services
