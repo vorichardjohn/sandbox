@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Organization Chart</title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -8,7 +7,8 @@
     <script src="https://code.highcharts.com/modules/organization.js"></script>
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    
     <style>
         .highcharts-figure,
         .highcharts-data-table table {
@@ -76,8 +76,8 @@
             }
         }
     </style>
-</head>
 
+</head>
 <body>
     <figure class="highcharts-figure">
         <div id="container"></div>
@@ -88,129 +88,88 @@
             the process of creating these types of visualizations.
         </p>
     </figure>
-</body>
 
-<script>
-    Highcharts.chart('container', {
-        chart: {
-            height: 600,
-            inverted: true
-        },
-
-        title: {
-            text: 'Highcharts Org Chart'
-        },
-
-        accessibility: {
-            point: {
-                descriptionFormat: '{add index 1}. {toNode.name}' +
-                    '{#if (ne toNode.name toNode.id)}, {toNode.id}{/if}, ' +
-                    'reports to {fromNode.id}'
-            }
-        },
-
-        series: [{
-            type: 'organization',
-            name: 'Highsoft',
-            keys: ['from', 'to'],
-            data: [
-                ['Shareholders', 'Board'],
-                ['Board', 'CEO'],
-                ['CEO', 'CTO'],
-                ['CEO', 'CPO'],
-                ['CEO', 'CSO'],
-                ['CEO', 'HR'],
-                ['CTO', 'Product'],
-                ['CTO', 'Web'],
-                ['CSO', 'Sales'],
-                ['HR', 'Market'],
-                ['CSO', 'Market'],
-                ['HR', 'Market'],
-                ['CTO', 'Market']
-            ],
-            levels: [{
-                level: 0,
-                color: 'silver',
-                dataLabels: {
-                    color: 'black'
-                },
-                height: 25
-            }, {
-                level: 1,
-                color: 'silver',
-                dataLabels: {
-                    color: 'black'
-                },
-                height: 25
-            }, {
-                level: 2,
-                color: '#980104'
-            }, {
-                level: 4,
-                color: '#359154'
-            }],
-            nodes: [{
-                id: 'Shareholders'
-            }, {
-                id: 'Board'
-            }, {
-                id: 'CEO',
-                title: 'CEO',
-                name: 'Atle Sivertsen',
-                image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2022/06/30081411/portrett-sorthvitt.jpg'
-            }, {
-                id: 'HR',
-                title: 'CFO',
-                name: 'Anne Jorunn Fjærestad',
-                color: '#007ad0',
-                image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131210/Highsoft_04045_.jpg'
-            }, {
-                id: 'CTO',
-                title: 'CTO',
-                name: 'Christer Vasseng',
-                image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131120/Highsoft_04074_.jpg'
-            }, {
-                id: 'CPO',
-                title: 'CPO',
-                name: 'Torstein Hønsi',
-                image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131213/Highsoft_03998_.jpg'
-            }, {
-                id: 'CSO',
-                title: 'CSO',
-                name: 'Anita Nesse',
-                image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131156/Highsoft_03834_.jpg'
-            }, {
-                id: 'Product',
-                name: 'Product developers'
-            }, {
-                id: 'Web',
-                name: 'Web devs, sys admin'
-            }, {
-                id: 'Sales',
-                name: 'Sales team'
-            }, {
-                id: 'Market',
-                name: 'Marketing team',
-                column: 5
-            }],
-            colorByPoint: false,
-            color: '#007ad0',
-            dataLabels: {
-                color: 'white'
-            },
-            borderColor: 'white',
-            nodeWidth: 'auto'
-        }],
-        tooltip: {
-            outside: true
-        },
-        exporting: {
-            allowHTML: true,
-            sourceWidth: 800,
-            sourceHeight: 600
+    <script>
+        function loadAndParseCSV(filePath) {
+            fetch(filePath)
+                .then(response => response.text())
+                .then(csv => {
+                    // Simplified CSV Parsing for Debugging
+                    const rows = csv.trim().split("\n");
+                    const headers = rows.shift().split(",");
+                    const data = rows.map(row => {
+                        const values = row.split(",");
+                        return {
+                            id: values[0].trim(),
+                            name: values[1].trim(),
+                            title: values[2].trim(),
+                            parentId: values[3].trim(),
+                        };
+                    });
+        
+                    console.log("Parsed CSV Data:", data);
+        
+                    // Prepare data for Highcharts
+                    const seriesData = data.filter(item => item.parentId).map(item => [item.parentId, item.id]);
+                    const nodesData = data.map(item => ({ id: item.id, title: item.title, name: item.name }));
+        
+                    console.log("Series Data:", seriesData);
+                    console.log("Nodes Data:", nodesData);
+        
+                    // Highcharts Initialization with Parsed Data
+                    Highcharts.chart('container', {
+                        chart: {
+                            height: 600,
+                            inverted: true,
+                            type: 'organization'
+                        },
+                        title: {
+                            text: 'Highcharts Org Chart'
+                        },
+                        series: [{
+                            type: 'organization',
+                            name: 'Organization',
+                            keys: ['from', 'to'],
+                            data: seriesData,
+                            nodes: nodesData,
+                            levels: [{
+                                level: 0,
+                                color: 'silver',
+                                dataLabels: {
+                                    color: 'black'
+                                },
+                                height: 25
+                            }],
+                            colorByPoint: false,
+                            color: '#007ad0',
+                            dataLabels: {
+                                color: 'white'
+                            },
+                            borderColor: 'white',
+                            nodeWidth: 65
+                        }],
+                        exporting: {
+                            allowHTML: true,
+                            buttons: {
+                                exportButton: {
+                                    text: 'Download 16:9',
+                                    onclick: function() {
+                                        this.exportChart({ 
+                                            width: 1920, 
+                                            sourceWidth: 1920, 
+                                            sourceHeight: 1080 
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
         }
+        
+        loadAndParseCSV('data/org_data_000001.csv');
+        </script>
+        
 
-    });
-</script>
-
+</body>
 </html>
