@@ -5,14 +5,6 @@
 <title>Organization Chart Example</title>
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/organization.js"></script>
-<style>
-/* Define custom location-based colors */
-.location-new-york { fill: #ffcc00; }
-.location-chicago { fill: #ff6666; }
-.location-san-francisco { fill: #66ccff; }
-.location-los-angeles { fill: #99cc00; }
-.location-boston { fill: #ff99cc; }
-</style>
 </head>
 <body>
 <div id="container"></div>
@@ -29,12 +21,6 @@ Highcharts.chart('container', {
         keys: ['id', 'name', 'title', 'parentId', 'scope', 'location', 'email', 'slackId', 'photo'],
         data: {
             csv: document.getElementById('csv').innerHTML
-        },
-        nodeFormatter: function () {
-            var locationClass = 'location-' + this.node.location.replace(/\s+/g, '-').toLowerCase();
-            return {
-                className: locationClass
-            };
         },
         nodes: [{
             id: 'email',
