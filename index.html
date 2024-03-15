@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Organization Chart</title>
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -8,7 +9,7 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
     <script src="https://code.highcharts.com/modules/data.js"></script>
-    
+
     <style>
         .highcharts-figure,
         .highcharts-data-table table {
@@ -78,6 +79,7 @@
     </style>
 
 </head>
+
 <body>
     <figure class="highcharts-figure">
         <div id="container"></div>
@@ -94,29 +96,25 @@
             fetch(filePath)
                 .then(response => response.text())
                 .then(csv => {
-                    // Simplified CSV Parsing for Debugging
+                    const data = []; // For series data
+                    const nodes = []; // For nodes data, including scope
                     const rows = csv.trim().split("\n");
-                    const headers = rows.shift().split(",");
-                    const data = rows.map(row => {
-                        const values = row.split(",");
-                        return {
-                            id: values[0].trim(),
-                            name: values[1].trim(),
-                            title: values[2].trim(),
-                            parentId: values[3].trim(),
-                        };
+
+                    rows.forEach((row, index) => {
+                        if (index > 0 && row) { // Skip header row
+                            const [id, name, title, parentId, scope] = row.split(',').map(item => item.trim());
+                            if (parentId) {
+                                data.push([parentId, id]); // Add link if parentId exists
+                            }
+                            // Adding scope to the node's label
+                            nodes.push({
+                                id: id,
+                                name: `${name}<br>${title}<br><span style="color: #707070; font-style: italic;">${scope}</span>`
+                            });
+                        }
                     });
-        
-                    console.log("Parsed CSV Data:", data);
-        
-                    // Prepare data for Highcharts
-                    const seriesData = data.filter(item => item.parentId).map(item => [item.parentId, item.id]);
-                    const nodesData = data.map(item => ({ id: item.id, title: item.title, name: item.name }));
-        
-                    console.log("Series Data:", seriesData);
-                    console.log("Nodes Data:", nodesData);
-        
-                    // Highcharts Initialization with Parsed Data
+
+                    // Initialize Highcharts with parsed CSV data
                     Highcharts.chart('container', {
                         chart: {
                             height: 600,
@@ -128,48 +126,48 @@
                         },
                         series: [{
                             type: 'organization',
-                            name: 'Organization',
+                            name: 'Organization Chart',
                             keys: ['from', 'to'],
-                            data: seriesData,
-                            nodes: nodesData,
-                            levels: [{
-                                level: 0,
-                                color: 'silver',
-                                dataLabels: {
-                                    color: 'black'
-                                },
-                                height: 25
-                            }],
+                            data: data,
+                            nodes: nodes,
                             colorByPoint: false,
                             color: '#007ad0',
                             dataLabels: {
-                                color: 'white'
+                                color: 'white',
+                                nodeFormatter: function () {
+                                    return `<b>${this.point.name}</b>`;
+                                },
+                                useHTML: true
                             },
                             borderColor: 'white',
                             nodeWidth: 65
                         }],
+                        tooltip: {
+                            outside: true
+                        },
                         exporting: {
                             allowHTML: true,
                             buttons: {
                                 exportButton: {
                                     text: 'Download 16:9',
-                                    onclick: function() {
-                                        this.exportChart({ 
-                                            width: 1920, 
-                                            sourceWidth: 1920, 
-                                            sourceHeight: 1080 
+                                    onclick: function () {
+                                        this.exportChart({
+                                            width: 1920,
+                                            sourceWidth: 1920,
+                                            sourceHeight: 1080
                                         });
                                     }
                                 }
                             }
                         }
                     });
-                });
+                })
+                .catch(error => console.error('Error loading or parsing CSV:', error));
         }
-        
+
         loadAndParseCSV('data/org_data_000001.csv');
-        </script>
-        
+    </script>
 
 </body>
+
 </html>
