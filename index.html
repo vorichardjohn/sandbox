@@ -3,8 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <title>Organization Chart Example</title>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/organization.js"></script>
 </head>
 <body>
-    <p>HELLO WORLD</p>
+<div id="container"></div>
+
+<script>
+Highcharts.chart('container', {
+    chart: {
+        type: 'organization'
+    },
+    title: {
+        text: 'Organization Chart'
+    },
+    series: [{
+        keys: ['id', 'name', 'title', 'parentId', 'scope', 'location', 'email', 'slackId', 'photo'],
+        data: {
+            csv: document.getElementById('csv').innerHTML
+        },
+        nodes: [{
+            id: 'email',
+            title: 'Email: {point.email}'
+        }, {
+            id: 'slack',
+            title: 'Slack ID: {point.slackId}'
+        }],
+        point: {
+            events: {
+                click: function() {
+                    window.location.href = 'https://slack.com/' + this.url;
+                }
+            }
+        }
+    }]
+});
+</script>
+
+<!-- Dummy data -->
+<pre id="csv" style="display: none">id,name,title,parentId,scope,location,email,slackId,photo
+jd01,John Doe,Manager,ew05,Sales,New York,johndoe@example.com,@johndoe,johndoe.jpg
+js02,Jane Smith,Analyst,jd01,Sales,New York,janesmith@example.com,@janesmith,janesmith.jpg
+aj03,Alice Johnson,Director,sw07,Marketing,Chicago,alicejohnson@example.com,@alicejohnson,alicejohnson.jpg
+bb04,Bob Brown,Analyst,aj03,Marketing,Chicago,bobbrown@example.com,@bobbrown,bobbrown.jpg
+ew05,Emily White,Vice President,cm09,Operations,San Francisco,emilywhite@example.com,@emilywhite,emilywhite.jpg
+dl06,David Lee,Analyst,ew05,Operations,San Francisco,davidlee@example.com,@davidlee,davidlee.jpg
+sw07,Sarah Wilson,Director,cm09,HR,Los Angeles,sarahwilson@example.com,@sarahwilson,sarahwilson.jpg
+md08,Michael Davis,Analyst,sw07,HR,Los Angeles,michaeldavis@example.com,@michaeldavis,michaeldavis.jpg
+cm09,Chris Miller,Vice President,Finance,Boston,chrismiller@example.com,@chrismiller,chrismiller.jpg
+</pre>
 </body>
 </html>
